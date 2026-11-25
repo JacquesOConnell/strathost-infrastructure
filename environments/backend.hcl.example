@@ -1,0 +1,9 @@
+# Copy to ignored backend.hcl and supply the already bootstrapped bucket/key.
+bucket       = "REPLACE_WITH_APPROVED_STATE_BUCKET"
+key          = "environments/test/terraform.tfstate"
+region       = "eu-west-1"
+encrypt      = true
+use_lockfile = true
+kms_key_id   = "REPLACE_WITH_STATE_KMS_KEY_ARN"
+allowed_account_ids = ["REPLACE_WITH_APPROVED_STATE_ACCOUNT"]
+# Credentials come from the approved short-lived AWS role session, never this file.

@@ -1,0 +1,13 @@
+{
+  "vault": "strathost-test-euw1-vault-workloads",
+  "warning_hours": 26,
+  "critical_hours": 36,
+  "resources": {
+    "docker-01": "REPLACE_WITH_INSTANCE_ARN",
+    "docker-02": "REPLACE_WITH_INSTANCE_ARN",
+    "docker-03": "REPLACE_WITH_INSTANCE_ARN",
+    "vpn": "REPLACE_WITH_INSTANCE_ARN",
+    "checkmk": "REPLACE_WITH_INSTANCE_ARN",
+    "efs": "REPLACE_WITH_FILESYSTEM_ARN"
+  }
+}

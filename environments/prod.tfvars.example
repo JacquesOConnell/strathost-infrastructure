@@ -1,0 +1,28 @@
+# Same module layout; production naming, sizing and retention are selected by environment.
+# Begin from test.tfvars.example and replace every placeholder with separately approved production values.
+environment         = "prod"
+expected_account_id = "REPLACE_WITH_APPROVED_PRODUCTION_ACCOUNT"
+cost_center         = "REPLACE_WITH_COST_CENTER"
+availability_zones  = { a = "eu-west-1a", b = "eu-west-1b", c = "eu-west-1c" }
+docker_ami_id        = "REPLACE_WITH_PINNED_AMI"
+vpn_ami_id           = "REPLACE_WITH_PINNED_AMI"
+checkmk_ami_id       = "REPLACE_WITH_PINNED_AMI"
+key_administrator_role_arns = ["REPLACE_WITH_KEY_ADMIN_ROLE_ARN"]
+recovery_role_arn           = "REPLACE_WITH_RECOVERY_ROLE_ARN"
+vpn_client_cidrs           = ["REPLACE_WITH_APPROVED_PUBLIC_SOURCE_CIDR"]
+certificate_arns = {
+  public   = "REPLACE_WITH_ISSUED_ACM_ARN"
+  secure   = "REPLACE_WITH_ISSUED_ACM_ARN"
+  internal = "REPLACE_WITH_ISSUED_ACM_ARN"
+}
+hostnames = { public = "www.example.com", secure = "secure.example.com", internal = "internal.example.com" }
+private_dns_zone_name = "internal.example.com"
+checkmk_hostname      = "monitor.internal.example.com"
+final_snapshot_suffix = "REPLACE_WITH_UNIQUE_RELEASE_LABEL"
+ssm_artifact_bucket_arns = ["REPLACE_WITH_REVIEWED_REGIONAL_SSM_BUCKET_ARN"]
+# Diagram baseline. Per-AZ NAT is separately documented as a recommendation.
+single_nat_gateway          = true
+enable_public_routing       = false
+enable_internal_routing     = false
+enable_secure_routing       = false
+secure_origin_auth_verified = false

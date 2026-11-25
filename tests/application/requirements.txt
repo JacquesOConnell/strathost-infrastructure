@@ -1,0 +1,2 @@
+# Test-fixture certificate/JWT generation only; not a WordPress runtime dependency.
+cryptography==50.0.2

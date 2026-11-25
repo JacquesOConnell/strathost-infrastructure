@@ -1,0 +1,11 @@
+# Backup schedules
+
+I used one protected encrypted vault, one daily plan at 01:00 UTC and one explicit selection of all five EC2 servers plus Regional EFS. The plan allows a sixty-minute start window and 180-minute completion window, retaining fourteen days in production or two days in test. These are engineering selections pending RPO/RTO approval. There is no cold tier, cross-account copy, Vault Lock or duplicate RDS backup plan hidden in the baseline.
+
+EC2 backup includes attached root/data volumes, so Checkmk's attached data disk is included in its instance recovery point. The composition root waits for the attachment. EFS backups use the vault key; EBS snapshots retain their source-key dependency. Keep all required keys and the vault available through the recovery retention period. RDS uses its native automated backups and final snapshot in the database module. Logical S3 application exports are separately configured on Docker01.
+
+The vault disables force destruction and has `prevent_destroy`; a general `terraform destroy` will be blocked by this and key protection. Recovery must be planned before controlled teardown. No irreversible compliance lock is enabled automatically. EC2/EFS snapshots do not by themselves prove WordPress database/files consistency or Checkmk application-consistent recovery.
+
+Schema validation and one mocked test pass. Verify account/region service opt-ins and quotas without overwriting shared account settings. Inspect actual backup jobs, confirm every expected recovery point, configure Checkmk freshness checks and perform EC2/EFS/RDS and Checkmk restores. No successful backup or restore has been performed by this repository work.
+
+References: [resource assignment and opt-in](https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html), [backup encryption](https://docs.aws.amazon.com/aws-backup/latest/devguide/encryption.html), [EC2 backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/working-with-supported-services.html), [Terraform plan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_plan), [selection](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_selection).

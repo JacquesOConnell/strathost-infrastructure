@@ -1,0 +1,7 @@
+bucket              = "strathost-tfstate-111122223333-euw1"
+key                 = "bootstrap/terraform.tfstate"
+region              = "eu-west-1"
+encrypt             = true
+kms_key_id          = "arn:aws:kms:eu-west-1:111122223333:key/REPLACE_WITH_BOOTSTRAP_OUTPUT"
+use_lockfile        = true
+allowed_account_ids = ["111122223333"]

@@ -1,0 +1,96 @@
+# One site per Compose project; deploy the same approved images/configuration on all three hosts.
+services:
+  wordpress:
+    image: ${WORDPRESS_IMAGE:?Use the built and reviewed image digest}
+    restart: "no"
+    environment:
+      WORDPRESS_DB_HOST: ${DATABASE_HOST:?Required}:3306
+      WORDPRESS_DB_NAME: ${DATABASE_NAME:?Required}
+      WORDPRESS_DB_USER_FILE: /run/secrets/database_user
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/database_password
+      WORDPRESS_AUTH_KEY_FILE: /run/secrets/auth_key
+      WORDPRESS_SECURE_AUTH_KEY_FILE: /run/secrets/secure_auth_key
+      WORDPRESS_LOGGED_IN_KEY_FILE: /run/secrets/logged_in_key
+      WORDPRESS_NONCE_KEY_FILE: /run/secrets/nonce_key
+      WORDPRESS_AUTH_SALT_FILE: /run/secrets/auth_salt
+      WORDPRESS_SECURE_AUTH_SALT_FILE: /run/secrets/secure_auth_salt
+      WORDPRESS_LOGGED_IN_SALT_FILE: /run/secrets/logged_in_salt
+      WORDPRESS_NONCE_SALT_FILE: /run/secrets/nonce_salt
+      STRATHOST_VISIBILITY: ${VISIBILITY:?Required}
+      STRATHOST_ACCESS_ISSUER: ${ACCESS_ISSUER:-}
+      STRATHOST_ACCESS_AUDIENCE: ${ACCESS_AUDIENCE:-}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('DISALLOW_FILE_MODS', true);
+        define('DISABLE_WP_CRON', true);
+        define('FORCE_SSL_ADMIN', true);
+        define('WP_HOME', 'https://${SITE_HOSTNAME}');
+        define('WP_SITEURL', 'https://${SITE_HOSTNAME}');
+        if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+          $$_SERVER['HTTPS'] = 'on';
+        }
+    volumes:
+      - type: bind
+        source: ${UPLOADS_PATH:?Required}
+        target: /var/www/html/wp-content/uploads
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${RDS_CA_FILE:?Required}
+        target: /etc/ssl/certs/rds-ca-bundle.pem
+        read_only: true
+        bind:
+          create_host_path: false
+    secrets:
+      - database_user
+      - database_password
+      - auth_key
+      - secure_auth_key
+      - logged_in_key
+      - nonce_key
+      - auth_salt
+      - secure_auth_salt
+      - logged_in_salt
+      - nonce_salt
+    networks: [site]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: ${WORDPRESS_MEMORY_LIMIT:-512m}
+    pids_limit: 256
+  proxy:
+    image: ${NGINX_IMAGE:?Use an approved Nginx digest}
+    restart: "no"
+    depends_on: [wordpress]
+    ports: ["${PRIVATE_IP:?Required}:${PROXY_PORT:?Required}:8080"]
+    volumes:
+      - type: bind
+        source: ${PROXY_CONFIG:?Required}
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [site]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 64m
+    pids_limit: 64
+networks:
+  site: {}
+secrets:
+  database_user:
+    file: ${SECRETS_DIRECTORY:?Required}/database_user
+  database_password:
+    file: ${SECRETS_DIRECTORY:?Required}/database_password
+  auth_key:
+    file: ${SECRETS_DIRECTORY:?Required}/auth_key
+  secure_auth_key:
+    file: ${SECRETS_DIRECTORY:?Required}/secure_auth_key
+  logged_in_key:
+    file: ${SECRETS_DIRECTORY:?Required}/logged_in_key
+  nonce_key:
+    file: ${SECRETS_DIRECTORY:?Required}/nonce_key
+  auth_salt:
+    file: ${SECRETS_DIRECTORY:?Required}/auth_salt
+  secure_auth_salt:
+    file: ${SECRETS_DIRECTORY:?Required}/secure_auth_salt
+  logged_in_salt:
+    file: ${SECRETS_DIRECTORY:?Required}/logged_in_salt
+  nonce_salt:
+    file: ${SECRETS_DIRECTORY:?Required}/nonce_salt

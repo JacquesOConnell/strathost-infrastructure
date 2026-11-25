@@ -1,0 +1,192 @@
+{
+  "run": "20261125130054",
+  "images": {
+    "wordpress": "wordpress@sha256:9b46af6a41fd0dcb2e5cf85033a6350d05010356847ede1cfcac5cf94292eb26",
+    "mysql": "mysql@sha256:8c233bad33d520a7aae1c1e619c3a9775f4a1ba2d463d692fada04ec7f40be00",
+    "nginx": "nginx@sha256:6437a63b5c529f0e06162b3f593c0154cff6fa2ea0f94fd7c27928cb399e022d",
+    "built_wordpress_id": "sha256:208f2549dd52ff6c70443b50178e6c6415d1f8340f88d42e75dfc3fad453d509"
+  },
+  "results": [
+    {
+      "test": "Production Dockerfile builds and all three PHP files pass lint",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "All four application replicas pass real WordPress/database/uploads readiness",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Public and internal application pages render through the production proxy template",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Wrong Host and external diagnostic routes are rejected",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects missing token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects malformed token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects expired token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects unsigned token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects wrong audience token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects wrong issuer token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects future issued token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects not yet valid token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects unknown signing key token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access rejects forged signature token",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Valid signed Access token succeeds after HTTPS JWKS retrieval with trusted fixture CA",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Valid Access token still requires a separate WordPress administrator login",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Forged identity header alone does not authenticate a protected request",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Rotated Access signing key succeeds after bounded cache refresh",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access fails closed when signing-key endpoint is unavailable and cache has expired",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Access recovers after signing-key endpoint returns",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Production wpdb drop-in establishes verified encrypted MySQL connection",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Database certificate hostname mismatch fails closed",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Untrusted database CA fails connection and readiness",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Database connectivity recovers after restoring the trusted CA",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Application fails closed when its database user lacks access to the selected database",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Two public replicas read the same uploaded file from shared test storage",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Unwritable uploads fail application readiness",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Application readiness recovers after restoring uploads permissions",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "WordPress administrator session remains valid across replicas using shared salts/database",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Database outage makes application readiness fail",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Application readiness recovers after database restart",
+      "result": "pass",
+      "detail": ""
+    },
+    {
+      "test": "Linux startup helper refuses a missing uploads mount before secret retrieval",
+      "result": "pass",
+      "detail": ""
+    }
+  ],
+  "limits": "Local MySQL and shared Docker volume fixtures; no AWS RDS/EFS/VPN/Checkmk or Cloudflare account integration.",
+  "runtime": {
+    "wordpress": "7.1.5",
+    "php": "8.3.37",
+    "docker_server": "29.7.2",
+    "container_os": "Debian GNU/Linux 13 (trixie)"
+  },
+  "source_sha256": {
+    "scripts/wordpress/Dockerfile": "43b2c0675f1a34c1be3a48b9dca9a47bb7e9ddea28a76f32bcbef5e416b3fa7e",
+    "scripts/wordpress/compose.yaml": "4201ff3a7d4c39ffc696c051ee273f9f18329a7f0ab12f924a2817cc4d3809ca",
+    "scripts/wordpress/deploy.sh": "c0d846e198d8a4dbd76d56b7e4591ccf4ee7fac8ca9dac63248f8e5ba1fc5a51",
+    "scripts/wordpress/start-site.sh": "e14212da86f1d3f7ef003e741f2609ae7971b10ec1d294e8c50bbe17a3521d07",
+    "scripts/wordpress/php/db.php": "b22c8224d84acc58efba893239f7177cd5c63ba26e582bf7e84531f6181bdeb1",
+    "scripts/wordpress/php/strathost-access.php": "fdb6fd24bc546543320fbbd8441edec74c7adb8b4ca5b3bbec1d9d78fae5aa95",
+    "scripts/wordpress/php/strathost-health.php": "c7aa0d1d227beccaa3f59046d0e04167634759d0cde12ef8ac2aaf0b7c1fd51c"
+  },
+  "cleanup_verified": {
+    "containers_removed": true,
+    "networks_removed": true,
+    "volumes_removed": true
+  }
+}

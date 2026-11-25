@@ -1,0 +1,14 @@
+{
+  "site": "public_wordpress",
+  "hostname": "www.example.com",
+  "private_ip": "10.0.4.10",
+  "database_host": "REPLACE_WITH_RDS_DNS_ENDPOINT",
+  "database_name": "public_wordpress",
+  "secret_arn": "REPLACE_WITH_SITE_SECRET_ARN",
+  "wordpress_image": "REPLACE_WITH_CUSTOM_IMAGE_AT_SHA256_DIGEST",
+  "nginx_image": "REPLACE_WITH_NGINX_IMAGE_AT_SHA256_DIGEST",
+  "wordpress_memory_limit": "256m",
+  "rds_ca_file": "/etc/strathost/rds-ca-bundle.pem",
+  "access_issuer": "",
+  "access_audience": ""
+}

@@ -1,0 +1,19 @@
+expected_account_id = "111122223333"
+cost_center         = "InterviewSandbox"
+
+key_administrator_role_arns = ["arn:aws:iam::111122223333:role/StratHostStateAdministrator"]
+
+backend_access = {
+  bootstrap = {
+    role_arn   = "arn:aws:iam::111122223333:role/StratHostStateAdministrator"
+    state_keys = ["bootstrap/terraform.tfstate"]
+  }
+  test = {
+    role_arn   = "arn:aws:iam::111122223333:role/StratHostTestDeployment"
+    state_keys = ["environments/test/terraform.tfstate", "cloudflare/test/terraform.tfstate"]
+  }
+  prod = {
+    role_arn   = "arn:aws:iam::111122223333:role/StratHostProductionDeployment"
+    state_keys = ["environments/prod/terraform.tfstate", "cloudflare/prod/terraform.tfstate"]
+  }
+}
