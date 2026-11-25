@@ -20,3 +20,5 @@ Dockerfile text eol=lf
 *.pdf binary
 *.docx binary
 *.zip binary
+# Preserve the checksummed Checkmk delivery files byte for byte.
+checkmk-dev-lab/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

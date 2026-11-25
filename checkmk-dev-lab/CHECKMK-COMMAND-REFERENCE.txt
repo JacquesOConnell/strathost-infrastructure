@@ -1,0 +1,200 @@
+CHECKMK DEVELOPMENT LAB COMMAND REFERENCE
+Recorded 25 November 2026
+Read the guide for execution status, context, errors and one-time creation safeguards.
+Replace INSTANCE_ID, DOWNLOAD_TOKEN and REGISTRATION_TOKEN before use.
+No destructive cloud commands are included.
+
+BLOCK 1 (bash)
+cat /etc/os-release
+uname -m
+free -h
+df -h /
+sudo apt update
+sudo apt install -y curl ca-certificates gnupg
+
+BLOCK 2 (bash)
+cd /tmp
+curl -fLO https://download.checkmk.com/checkmk/2.5.0p21/check-mk-ultimate-2.5.0p21_0.noble_amd64.deb
+curl -fLO https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg
+gpg --import Check_MK-pubkey.gpg
+gpg --verify check-mk-ultimate-2.5.0p21_0.noble_amd64.deb
+sudo apt install -y /tmp/check-mk-ultimate-2.5.0p21_0.noble_amd64.deb
+omd version
+
+BLOCK 3 (bash)
+sudo omd create devmonitor
+sudo omd start devmonitor
+sudo omd status devmonitor
+curl -I http://localhost/devmonitor/
+
+BLOCK 4 (powershell)
+aws --version
+session-manager-plugin --version
+
+BLOCK 5 (powershell)
+& "$env:ProgramFiles\Amazon\SessionManagerPlugin\bin\session-manager-plugin.exe" --version
+
+BLOCK 6 (powershell)
+aws sts get-caller-identity --region af-south-1
+aws ssm start-session --region af-south-1 --target INSTANCE_ID --document-name AWS-StartPortForwardingSession --parameters "portNumber=80,localPortNumber=8080"
+
+BLOCK 7 (bash)
+cd "$(mktemp -d)"
+curl -o check-mk-agent_2.5.0p21-1_all.deb -fJG \
+  'http://localhost/devmonitor/check_mk/api/internal/domain-types/agent/actions/download_by_host_via_token/invoke' \
+  --header 'Accept: application/octet-stream' \
+  --header 'Authorization: CMK-TOKEN DOWNLOAD_TOKEN' \
+  --data-urlencode 'os_type=linux_deb' \
+  --data-urlencode 'agent_type=host_name' \
+  --data-urlencode 'host_name=dev-checkmk-01' &&
+sudo dpkg -i check-mk-agent_2.5.0p21-1_all.deb
+
+BLOCK 8 (bash)
+sudo cmk-agent-ctl register \
+  --hostname dev-checkmk-01 \
+  --server localhost \
+  --site devmonitor \
+  --ott REGISTRATION_TOKEN
+sudo cmk-agent-ctl status
+
+BLOCK 9 (bash)
+free -h
+ps -eo pid,comm,rss --sort=-rss | head -n 15
+
+BLOCK 10 (bash)
+sudo -iu devmonitor omd restart apache
+free -h
+
+BLOCK 11 (bash)
+df -hT /
+sudo swapon --show
+ls -lh /swapfile /swapfile-checkmk 2>/dev/null
+sudo fallocate -l 2G /swapfile-checkmk
+sudo chmod 600 /swapfile-checkmk
+sudo mkswap /swapfile-checkmk
+sudo swapon /swapfile-checkmk
+sudo swapon --show
+free -h
+
+BLOCK 12 (bash)
+sudo cp --update=none /etc/fstab /etc/fstab.before-checkmk-swap
+grep -q '^/swapfile-checkmk[[:space:]]' /etc/fstab || printf '%s\n' '/swapfile-checkmk none swap sw,nofail 0 0' | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload
+grep '^/swapfile-checkmk[[:space:]]' /etc/fstab
+
+BLOCK 13 (json)
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RegionalInventoryAndMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeVolumeStatus",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:DescribeAlarms",
+        "dynamodb:ListTables",
+        "lambda:ListFunctions",
+        "rds:DescribeDBInstances",
+        "sns:ListTopics",
+        "tag:GetResources",
+        "logs:DescribeLogGroups"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "SameAccountRegionalResourceMetadata",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTagsOfResource",
+        "lambda:ListTags",
+        "lambda:ListProvisionedConcurrencyConfigs",
+        "rds:ListTagsForResource",
+        "sns:GetTopicAttributes",
+        "sns:ListTagsForResource"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:af-south-1:DEV_ACCOUNT_ID:table/*",
+        "arn:aws:lambda:af-south-1:DEV_ACCOUNT_ID:function:*",
+        "arn:aws:rds:af-south-1:DEV_ACCOUNT_ID:db:*",
+        "arn:aws:sns:af-south-1:DEV_ACCOUNT_ID:*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "DiscoverOwnS3Buckets",
+      "Effect": "Allow",
+      "Action": "s3:ListAllMyBuckets",
+      "Resource": "*"
+    },
+    {
+      "Sid": "OwnBucketLocationAndTagsOnly",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetBucketTagging"
+      ],
+      "Resource": "arn:aws:s3:::*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceAccount": "${aws:PrincipalAccount}"
+        }
+      }
+    },
+    {
+      "Sid": "LambdaReportLogMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "logs:FilterLogEvents",
+        "logs:StartQuery",
+        "logs:GetQueryResults"
+      ],
+      "Resource": "arn:aws:logs:af-south-1:DEV_ACCOUNT_ID:log-group:/aws/lambda/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "CancelTimedOutRegionalLogQueries",
+      "Effect": "Allow",
+      "Action": "logs:StopQuery",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    }
+  ]
+}
+
+BLOCK 14 (bash)
+# Suggested OS upgrade only; completion not evidenced
+sudo apt upgrade -y
+# Suggested site listing during recovery; output not retained
+sudo omd sites
+# Suggested paging diagnostic only; not run
+vmstat 1 10
+# Historical backup command that produced a warning; superseded
+sudo cp -n /etc/fstab /etc/fstab.before-checkmk-swap
+
+BLOCK 15 (bash)
+sudo cmk-agent-ctl register --hostname dev-checkmk-01 --server localhost:80 --site devmonitor --ott REGISTRATION_TOKEN

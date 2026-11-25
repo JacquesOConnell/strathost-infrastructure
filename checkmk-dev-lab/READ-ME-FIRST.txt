@@ -1,0 +1,17 @@
+CHECKMK DEVELOPMENT LAB RECORD
+25 November 2026
+
+Use the PDF to read or send my completed implementation record.
+Use the Word document to make future edits.
+Use the Markdown document and evidence folder together for a portable source record.
+Use the command-reference TXT for exact command copying, with the guide for execution
+status, one-time creation safeguards and required placeholders.
+
+The IAM JSON is a TEMPLATE. Replace DEV_ACCOUNT_ID before submitting it to IAM.
+Passwords, access keys and one-time tokens are not included. Selected screenshots
+retain resource labels and an EC2 identifier, but exclude account-ID and credential images.
+
+Final evidence: 11 hosts UP, 94 services with one warning; 27 services marked stale.
+I confirmed the snapshot completed. I have not documented instance termination or a recovery test.
+The snapshot itself is not included in this package.
+This manual lab is separate from the StratHost Terraform project.

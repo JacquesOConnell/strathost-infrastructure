@@ -4,6 +4,7 @@ I implement the supplied three-AZ WordPress hosting architecture with small serv
 
 ## Start here
 
+- [Checkmk development lab guide (PDF)](checkmk-dev-lab/CHECKMK-INSTALLATION-AND-MONITORING-GUIDE.pdf) and [editable Word guide](checkmk-dev-lab/CHECKMK-INSTALLATION-AND-MONITORING-GUIDE.docx) — separate manual AWS lab, with commands and screenshots in [checkmk-dev-lab](checkmk-dev-lab/READ-ME-FIRST.txt).
 - [Implementation record: what I used and why](docs/IMPLEMENTATION-RECORD.md)
 - [Deployment order, inputs and acceptance](docs/DEPLOYMENT.md)
 - [Separate AWS recommendations](docs/RECOMMENDATIONS.md)

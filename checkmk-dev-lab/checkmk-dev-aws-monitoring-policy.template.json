@@ -1,0 +1,102 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RegionalInventoryAndMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeVolumeStatus",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:DescribeAlarms",
+        "dynamodb:ListTables",
+        "lambda:ListFunctions",
+        "rds:DescribeDBInstances",
+        "sns:ListTopics",
+        "tag:GetResources",
+        "logs:DescribeLogGroups"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "SameAccountRegionalResourceMetadata",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTagsOfResource",
+        "lambda:ListTags",
+        "lambda:ListProvisionedConcurrencyConfigs",
+        "rds:ListTagsForResource",
+        "sns:GetTopicAttributes",
+        "sns:ListTagsForResource"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:af-south-1:DEV_ACCOUNT_ID:table/*",
+        "arn:aws:lambda:af-south-1:DEV_ACCOUNT_ID:function:*",
+        "arn:aws:rds:af-south-1:DEV_ACCOUNT_ID:db:*",
+        "arn:aws:sns:af-south-1:DEV_ACCOUNT_ID:*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "DiscoverOwnS3Buckets",
+      "Effect": "Allow",
+      "Action": "s3:ListAllMyBuckets",
+      "Resource": "*"
+    },
+    {
+      "Sid": "OwnBucketLocationAndTagsOnly",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetBucketTagging"
+      ],
+      "Resource": "arn:aws:s3:::*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceAccount": "${aws:PrincipalAccount}"
+        }
+      }
+    },
+    {
+      "Sid": "LambdaReportLogMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "logs:FilterLogEvents",
+        "logs:StartQuery",
+        "logs:GetQueryResults"
+      ],
+      "Resource": "arn:aws:logs:af-south-1:DEV_ACCOUNT_ID:log-group:/aws/lambda/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    },
+    {
+      "Sid": "CancelTimedOutRegionalLogQueries",
+      "Effect": "Allow",
+      "Action": "logs:StopQuery",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "af-south-1"
+        }
+      }
+    }
+  ]
+}
